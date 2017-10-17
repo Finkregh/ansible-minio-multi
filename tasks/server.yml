@@ -1,0 +1,22 @@
+---
+- name: install minio
+  pacman:
+    name: minio
+    state: latest
+    update_cache: yes
+  tags: install
+
+- name: copy systemd unit
+  copy:
+    src: minio-multi@.service
+    dest: "/usr/lib/systemd/system/minio-multi@.service"
+
+#- debug:
+#    msg: "{{ item.key }} - {{ item.value.data_path }}"
+#  with_dict: "{{ minio_instances }}"
+
+- name: create configs for each instance
+  template:
+    src: minio-template.conf.j2
+    dest: "/etc/minio/minio-{{ item.key }}.conf"
+  with_dict: "{{ minio_instances }}"
